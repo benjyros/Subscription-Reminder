@@ -15,6 +15,8 @@ const App = () => {
         }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="CreateReminder" component={CreateReminder} />
+        <Stack.Screen name="editReminder" component={editReminder} />
+        <Stack.Screen name="deleteReminder" component={deleteReminder} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -78,6 +80,79 @@ const CreateReminder = ({ navigation }) => {
     </View >
   );
 }
+
+const editReminder = ({ navigation }) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Edit Reminder</Text>
+      </View>
+      <View style={styles.main}>
+        <Text></Text>
+      </View>
+      <View style={styles.buttonView}>
+        <View style={{ width: '50%', paddingRight: 10 }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Home')
+            }
+          >
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: '50%', paddingLeft: 10 }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Home')
+            }
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <StatusBar style="auto" />
+    </View >
+  );
+}
+
+const deleteReminder = ({ navigation }) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Delete Reminder</Text>
+      </View>
+      <View style={styles.main}>
+        <Text></Text>
+      </View>
+      <View style={styles.buttonView}>
+        <View style={{ width: '50%', paddingRight: 10 }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Home')
+            }
+          >
+            <Text style={styles.buttonText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: '50%', paddingLeft: 10 }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Home')
+            }
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <StatusBar style="auto" />
+    </View >
+  );
+}
+
 // Ocean palette: 213861 345da7 3b8ac4 4bb4de efdbcb
 const styles = StyleSheet.create({
   container: {
