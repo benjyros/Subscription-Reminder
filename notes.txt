@@ -1,0 +1,23 @@
+https://github.com/henninghall/react-native-date-picker#example-1-modal
+
+npm install react-native-date-picker
+
+-> https://docs.expo.dev/development/create-development-builds/
+-> npm install -g eas-cli
+-> npx expo install expo-dev-client
+-> eas build
+-> copy paste:
+{
+  "builds": {
+    "development-simulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    }
+  }
+}
+
+-> eas build --profile development-simulator --platform ios
+-> https://expo.dev/accounts/%5Baccount%5D/projects/%5Bproject%5D/builds
