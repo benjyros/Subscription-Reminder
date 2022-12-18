@@ -31,6 +31,7 @@ export default function CreateReminder({ navigation }) {
                 <Text>Costs:</Text>
                 <TextInput
                     style={styles.input}
+                    onChangeText={cost => onChangeCosts(cost)}
                     keyboardType="numeric"
                     placeholder={"CHF"}
                 />
