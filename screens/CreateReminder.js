@@ -1,16 +1,23 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View } from 'react-native';
-import DatePicker from 'react-native-date-picker'
+import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, Pressable } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 
 export default function CreateReminder({ navigation }) {
-    const [title, onChangeTitle] = React.useState("title");
-    const [description, onChangDescription] = React.useState("description");
+    const [title, setTitle] = React.useState();
+    const [description, setDescription] = React.useState();
     const [costs, onChangeCosts] = React.useState("CHF");
 
-    const [dateStart, setDateStart] = React.useState(new Date());
-    const [dateEnd, setDateEnd] = React.useState(new Date());
-    const [open, setOpen] = React.useState(false);
+    const [sub, setSub] = React.useState();
+    const [subItems, setSubItems] = useState([]);
+
+    const handleAddSub = () => {
+        navigation.navigate('Home');
+        setSubItems([...subItems, sub]);
+        setSub(null);
+    }
+
+    const [selectedCycle, setSelectedCycle] = React.useState();
 
     return (
         <View style={styles.container} >
@@ -25,8 +32,9 @@ export default function CreateReminder({ navigation }) {
                 <Text>Title of Subscription:</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={text => onChangeTitle(text)}
                     placeholder={"title"}
+                    value={title}
+                    onChangeText={text => setTitle(text)}
                 />
                 <Text>Costs:</Text>
                 <TextInput
@@ -35,42 +43,16 @@ export default function CreateReminder({ navigation }) {
                     keyboardType="numeric"
                     placeholder={"CHF"}
                 />
-                <Text>Start:</Text>
-                <TextInput
-                    style={styles.input}
-                    onPressIn={() => setOpen(true)}
-                    value={dateStart}
-                />
-                <DatePicker
-                    modal
-                    open={open}
-                    date={dateStart}
-                    onConfirm={(date) => {
-                        setOpen(false)
-                        setDateStart(date)
-                    }}
-                    onCancel={() => {
-                        setOpen(false)
-                    }}
-                />
-                <Text>End:</Text>
-                <TextInput
-                    style={styles.input}
-                    onPressIn={() => setOpen(true)}
-                    value={dateEnd}
-                />
-                <DatePicker
-                    modal
-                    open={open}
-                    date={dateEnd}
-                    onConfirm={(date) => {
-                        setOpen(false)
-                        setDateEnd(date)
-                    }}
-                    onCancel={() => {
-                        setOpen(false)
-                    }}
-                />
+                <Text>Payment Cycle:</Text>
+                <Picker style={styles.picker}
+                    selectedValue={selectedCycle}
+                    onValueChange={(itemValue, itemIndex) =>
+                        setSelectedCycle(itemValue)
+                    }>
+                        <Picker.Item label='Every Week' value='week' />   
+                        <Picker.Item label='Every Month' value='month' />    
+                        <Picker.Item label='Every Year' value='year' />     
+                    </Picker>
                 <Text>Description:</Text>
                 <TextInput
                     style={styles.multiInput}
@@ -85,7 +67,7 @@ export default function CreateReminder({ navigation }) {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() =>
-                            navigation.navigate('Home')
+                            handleAddSub()
                         }
                     >
                         <Text style={styles.buttonText}>Save</Text>
@@ -167,4 +149,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#fff',
     },
+    picker: {
+
+    }
 });
