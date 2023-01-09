@@ -14,6 +14,9 @@ const Subscription = (props) => {
       <View style={styles.paymentInfo}>
         <Text style={styles.textPaymentInfo}>Payment is due {props.paymentDate}</Text>
       </View>
+      <View style={styles.paymentAmount}>
+        <Text style={styles.textPaymentAmount}> 15.30 CHF</Text>
+      </View>
     </View>
   );
 };
@@ -54,10 +57,24 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     padding: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   textPaymentInfo: {
     fontSize: 13
   },
+  paymentAmount: {
+    position: "absolute",
+    bottom: 5,
+    right: 0,
+    padding: 10,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  textPaymentAmount: {
+    fontWeight: "bold",
+    fontSize: 18,
+  }
 });
 
 export default Subscription;

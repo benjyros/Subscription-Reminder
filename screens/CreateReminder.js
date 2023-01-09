@@ -1,12 +1,18 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, Pressable } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { firestore } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function CreateReminder({ navigation }) {
-    const [title, setTitle] = React.useState();
-    const [description, setDescription] = React.useState();
-    const [costs, onChangeCosts] = React.useState("CHF");
+    const [title, setTitle] = React.useState("");
+    const [description, setDescription] = React.useState("");
+    const [costs, setCosts] = React.useState("");
+    const [selectedCycle, setSelectedCycle] = React.useState("");
+
+
+
 
     const [sub, setSub] = React.useState();
     const [subItems, setSubItems] = useState([]);
@@ -14,10 +20,19 @@ export default function CreateReminder({ navigation }) {
     const handleAddSub = () => {
         navigation.navigate('Home');
         setSubItems([...subItems, sub]);
-        setSub(null);
+        addSub();
+
     }
 
-    const [selectedCycle, setSelectedCycle] = React.useState();
+    const addSub = async () => {
+        await setDoc(doc(firestore, 'subs', title), {
+            title: title,
+            costs: costs,
+            cycle: selectedCycle,
+            description: description
+        });
+    }
+
 
     return (
         <View style={styles.container} >
@@ -39,36 +54,36 @@ export default function CreateReminder({ navigation }) {
                 <Text>Costs:</Text>
                 <TextInput
                     style={styles.input}
-                    onChangeText={cost => onChangeCosts(cost)}
+                    onChangeText={cost => setCosts(cost)}
                     keyboardType="numeric"
                     placeholder={"CHF"}
+                    value={costs}
                 />
+                <Text>Start:</Text>
+
                 <Text>Payment Cycle:</Text>
                 <Picker style={styles.picker}
                     selectedValue={selectedCycle}
                     onValueChange={(itemValue, itemIndex) =>
                         setSelectedCycle(itemValue)
                     }>
-                        <Picker.Item label='Every Week' value='week' />   
-                        <Picker.Item label='Every Month' value='month' />    
-                        <Picker.Item label='Every Year' value='year' />     
-                    </Picker>
+                    <Picker.Item label='Every Week' value='week' />
+                    <Picker.Item label='Every Month' value='month' />
+                    <Picker.Item label='Every Year' value='year' />
+                </Picker>
                 <Text>Description:</Text>
                 <TextInput
                     style={styles.multiInput}
-                    multiline
-                    numberOfLines={5}
-                    onChangeText={text => onChangDescription(text)}
                     placeholder={"description"}
+                    onChangeText={description => setDescription(description)}
+                    value={description}
                 />
             </ScrollView>
             <View style={styles.buttonView}>
                 <View style={{ width: '50%', paddingRight: 10 }}>
                     <TouchableOpacity
                         style={styles.button}
-                        onPress={() =>
-                            handleAddSub()
-                        }
+                        onPress={handleAddSub}
                     >
                         <Text style={styles.buttonText}>Save</Text>
                     </TouchableOpacity>
