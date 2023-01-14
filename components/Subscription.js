@@ -6,7 +6,7 @@ const Subscription = (props) => {
     <View style={styles.item}>
       <View style={styles.upperRow}>
         <View style={styles.itemSignal}></View>
-        <Text style={styles.textName}>{props.name}</Text>
+        <Text style={styles.textName}>{props.title}</Text>
       </View>
       <View style={styles.description}>
         <Text style={styles.textDescription}>{props.description}</Text>
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     backgroundColor: "lightgreen",
+    
   },
   textName: {
     marginLeft: 10,

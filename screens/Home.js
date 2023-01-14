@@ -1,17 +1,63 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, TouchableOpacity, Text, View } from 'react-native';
-import Subscription from '../components/Subscription';
-import CreateReminder from './CreateReminder';
+import { collection, getDocs } from 'firebase/firestore';
+import { firestore } from '../firebase';
+import { useEffect } from 'react';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
-export default function Home ({ navigation }) {
+export default function Home({ navigation }) {
+
+    const [subscriptions, setSubscriptions] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            var subscriptions = [];
+            const c = collection(firestore, "reminders");
+            const cSnap = await getDocs(c);
+
+            cSnap.forEach((subscription) => {
+                const newSubscription = {
+                    title: subscription.data().title,
+                    costs: subscription.data().costs,
+                    cycle: subscription.data().selectedCycle,
+                    description: subscription.data().description
+                }
+                subscriptions.push(newSubscription);
+            });
+            setSubscriptions(subscriptions);
+        };
+        fetchData();
+    }, []);
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>Twäwis-Reminder</Text>
             </View>
             <ScrollView style={styles.main}>
-                <Subscription />
+
+                {subscriptions.map(({ title, costs, cycle, description }, index) => (
+                    <View
+                        key={index}
+                    >
+                        <View style={styles.item}>
+                            <View style={styles.upperRow}>
+                                <View style={styles.itemSignal}></View>
+                                <Text style={styles.textName}>{title}</Text>
+                            </View>
+                            <View style={styles.description}>
+                                <Text style={styles.textDescription}>{description}</Text>
+                            </View>
+                            <View style={styles.paymentInfo}>
+                                <Text style={styles.textPaymentInfo}>Payment is due {cycle}</Text>
+                            </View>
+                            <View style={styles.paymentAmount}>
+                                <Text style={styles.textPaymentAmount}> {costs}</Text>
+                            </View>
+                        </View>
+                    </View>
+                ))}
             </ScrollView >
             <View style={styles.buttonView}>
                 <TouchableOpacity
@@ -78,4 +124,58 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#fff',
     },
+    item: {
+        padding: 10,
+        backgroundColor: "skyblue",
+        width: 320,
+        height: 150,
+        borderRadius: 10,
+      },
+      upperRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        flexWrap: "wrap",
+      },
+      itemSignal: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: "lightgreen",
+        
+      },
+      textName: {
+        marginLeft: 10,
+        fontWeight: "bold",
+        fontSize: 18,
+      },
+      description: {
+        paddingTop: 5,
+    
+      },
+      textDescription: {
+        fontSize: 15,
+        flexShrink: 1,
+      },
+      paymentInfo: {
+        position: "absolute",
+        bottom: 5,
+        padding: 10,
+        alignItems: 'center',
+        flexDirection: 'row',
+      },
+      textPaymentInfo: {
+        fontSize: 13
+      },
+      paymentAmount: {
+        position: "absolute",
+        bottom: 5,
+        right: 0,
+        padding: 10,
+        alignItems: "center",
+        flexDirection: "row",
+      },
+      textPaymentAmount: {
+        fontWeight: "bold",
+        fontSize: 18,
+      }
 });
