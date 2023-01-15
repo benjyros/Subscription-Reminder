@@ -172,7 +172,7 @@ export default function CreateReminder({ navigation }) {
                     />
                 </View>
                 <View style={styles.components}>
-                    <Text>Start:</Text>
+                    <Text>Startdate {"("}yyyy-mm-dd{")"}:</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", }}>
                         <DropDownPicker
                             open={openDay}

@@ -7,6 +7,11 @@ import Home from './screens/Home';
 import CreateReminder from './screens/CreateReminder';
 import EditReminder from './screens/EditReminder';
 import DeleteReminder from './screens/DeleteReminder';
+import Tutorial1 from './screens/tutorial1';
+import Tutorial2 from './screens/tutorial2';
+import Tutorial3 from './screens/tutorial3';
+import Tutorial4 from './screens/tutorial4';
+import Tutorial5 from './screens/tutorial5';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +22,11 @@ const App = () => {
         screenOptions={{
           headerShown: false
         }}>
+          <Stack.Screen name="Tutorial1" component={Tutorial1} />
+          <Stack.Screen name="Tutorial2" component={Tutorial2} />
+          <Stack.Screen name="Tutorial3" component={Tutorial3} />
+          <Stack.Screen name="Tutorial4" component={Tutorial4} />
+          <Stack.Screen name="Tutorial5" component={Tutorial5} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="CreateReminder" component={CreateReminder} />
         <Stack.Screen name="editReminder" component={EditReminder} />
