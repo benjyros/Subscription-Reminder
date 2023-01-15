@@ -131,13 +131,11 @@ export default function CreateReminder({ navigation }) {
         let formattedDate = date.toISOString().slice(0, 10);
 
         var currentTimeInSeconds = Math.round(new Date().getTime() / 1000);
-        const startDate = year + "-" + month + "-" + day;
         await setDoc(doc(firestore, 'subs', formattedDate + ":" + currentTimeInSeconds.toString()), {
             id: currentTimeInSeconds.toString(),
             title: title,
             costs: costs,
             cycle: selectedCycle,
-            startDate: startDate,
             dueTo: formattedDate,
             description: description
         });

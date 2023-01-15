@@ -29,7 +29,6 @@ export default function Home({ navigation }) {
           title: subscription.data().title,
           costs: subscription.data().costs,
           cycle: subscription.data().cycle,
-          startDate: subscription.data().startDate,
           dueTo: subscription.data().dueTo,
           description: subscription.data().description,
         };
@@ -39,12 +38,6 @@ export default function Home({ navigation }) {
     }
     fetchData();
   }, []);
-
-  /*const deleteSub = (index) => {
-    let subscriptionCopy = [...subscriptions];
-    subscriptionCopy.splice(index, 1);
-    setSubscriptions(subscriptionCopy);
-  }*/
 
   const handleDelete = async (startDate, id) => {
     const subscriptionRef = doc(firestore, "subs", startDate + ":" + id);
@@ -62,7 +55,7 @@ export default function Home({ navigation }) {
         <Text style={styles.title}>Twäwis-Reminder</Text>
       </View>
       <ScrollView style={styles.main}>
-        {subscriptions.map(({ id, title, costs, cycle, startDate, dueTo, description }, index) => (
+        {subscriptions.map(({ id, title, costs, cycle, dueTo, description }, index) => (
           <View key={index}>
             <TouchableOpacity>
               <View style={styles.item}>
@@ -71,7 +64,7 @@ export default function Home({ navigation }) {
                   <Text style={styles.textName}>{title}</Text>
                 </View>
                 <View style={styles.trashWrapper}>
-                  <TouchableOpacity onPress={() => handleDelete(startDate, id)}>
+                  <TouchableOpacity onPress={() => handleDelete(dueTo, id)}>
                     <Image
                       style={styles.trashImage}
                       source={require("../images/trash.png")}
