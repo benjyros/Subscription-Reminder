@@ -4,14 +4,25 @@ import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View
 import { Picker } from '@react-native-picker/picker';
 import { firestore } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import moment from "moment/moment";
 
 export default function CreateReminder({ navigation }) {
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [costs, setCosts] = React.useState("");
     const [selectedCycle, setSelectedCycle] = React.useState("");
+    const [startDate, setStartDate] = useState(moment().toDate());
 
-
+    const handleCycleChange = (itemValue) => {
+        setSelectedCycle(itemValue);
+        if (itemValue === 'week') {
+            setStartDate((startDate) => moment(startDate).add(1, 'week').toDate());
+        } else if (itemValue === 'month') {
+            setStartDate((startDate) => moment(startDate).add(1, 'month').toDate());
+        } else if (itemValue === 'year') {
+            setStartDate((startDate) => moment(startDate).add(1, 'year').toDate());
+        }
+      }
 
 
     const [sub, setSub] = React.useState();
@@ -29,6 +40,7 @@ export default function CreateReminder({ navigation }) {
             title: title,
             costs: costs,
             cycle: selectedCycle,
+            startDate: moment(startDate).format("YYYY-MM-DD"),
             description: description
         });
     }
@@ -64,9 +76,7 @@ export default function CreateReminder({ navigation }) {
                 <Text>Payment Cycle:</Text>
                 <Picker style={styles.picker}
                     selectedValue={selectedCycle}
-                    onValueChange={(itemValue, itemIndex) =>
-                        setSelectedCycle(itemValue)
-                    }>
+                    onValueChange={handleCycleChange}>
                     <Picker.Item label='Every Week' value='week' />
                     <Picker.Item label='Every Month' value='month' />
                     <Picker.Item label='Every Year' value='year' />

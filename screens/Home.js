@@ -12,6 +12,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../firebase";
 import { useEffect } from "react";
 import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import moment from "moment";
 
 export default function Home({ navigation }) {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -27,6 +28,7 @@ export default function Home({ navigation }) {
           title: subscription.data().title,
           costs: subscription.data().costs,
           cycle: subscription.data().selectedCycle,
+          startDate: subscription.data().startDate,
           description: subscription.data().description,
         };
         subscriptions.push(newSubscription);
@@ -43,11 +45,14 @@ export default function Home({ navigation }) {
   }*/
 
   const handleDelete = async (title) => {
-    const subscriptionRef = doc(firestore, 'subs', title);
+    const subscriptionRef = doc(firestore, "subs", title);
     await deleteDoc(subscriptionRef);
 
-    setSubscriptions(subscriptions.filter(sub => sub.title !== title));
-  }
+    const newSubscriptions = subscriptions.slice();
+    const index = newSubscriptions.findIndex((sub) => sub.title === title);
+    newSubscriptions.splice(index, 1);
+    setSubscriptions(newSubscriptions);
+  };
 
   return (
     <View style={styles.container}>
@@ -55,33 +60,35 @@ export default function Home({ navigation }) {
         <Text style={styles.title}>Twäwis-Reminder</Text>
       </View>
       <ScrollView style={styles.main}>
-        {subscriptions.map(({ title, costs, cycle, description }, index) => (
+        {subscriptions.map(({ title, costs, cycle, startDate, description }, index) => (
           <View key={index}>
-            <View style={styles.item}>
-              <View style={styles.upperRow}>
-                <View style={styles.itemSignal}></View>
-                <Text style={styles.textName}>{title}</Text>
+            <TouchableOpacity>
+              <View style={styles.item}>
+                <View style={styles.upperRow}>
+                  <View style={styles.itemSignal}></View>
+                  <Text style={styles.textName}>{title}</Text>
+                </View>
+                <View style={styles.trashWrapper}>
+                  <TouchableOpacity onPress={() => handleDelete(title)}>
+                    <Image
+                      style={styles.trashImage}
+                      source={require("../images/trash.png")}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.description}>
+                  <Text style={styles.textDescription}>{description}</Text>
+                </View>
+                <View style={styles.paymentInfo}>
+                  <Text style={styles.textPaymentInfo}>
+                    Payment is due {moment(startDate).format("DD-MM-YYYY")}
+                  </Text>
+                </View>
+                <View style={styles.paymentAmount}>
+                  <Text style={styles.textPaymentAmount}> CHF {costs}</Text>
+                </View>
               </View>
-              <View style={styles.trashWrapper}>
-                <TouchableOpacity onPress={() => handleDelete()}>
-                  <Image
-                    style={styles.trashImage}
-                    source={require("../images/trash.png")}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.description}>
-                <Text style={styles.textDescription}>{description}</Text>
-              </View>
-              <View style={styles.paymentInfo}>
-                <Text style={styles.textPaymentInfo}>
-                  Payment is due {cycle}
-                </Text>
-              </View>
-              <View style={styles.paymentAmount}>
-                <Text style={styles.textPaymentAmount}> CHF{costs}</Text>
-              </View>
-            </View>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
