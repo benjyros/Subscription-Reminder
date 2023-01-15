@@ -11,8 +11,7 @@ import {
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../firebase";
 import { useEffect } from "react";
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
-import moment from "moment";
+import { doc, deleteDoc } from "firebase/firestore";
 
 export default function Home({ navigation }) {
   const [subscriptions, setSubscriptions] = useState([]);

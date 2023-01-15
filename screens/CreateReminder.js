@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, VirtualizedList, } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -103,7 +103,6 @@ export default function CreateReminder({ navigation }) {
         const currentTimeInSeconds = currentDate.getTime();
         var dueTo = newDate.getTime();
         if (selectedCycle === "week") {
-            //const newDate = moment(date, "YYYY-MM-DD").add(7, 'days');
             do {
                 dueTo = dueTo + (7 * 24 * 60 * 60 * 1000);
             } while (dueTo < currentTimeInSeconds);
@@ -121,8 +120,6 @@ export default function CreateReminder({ navigation }) {
             } while (dueTo < currentTimeInSeconds);
         }
         return dueTo;
-        //etDueTo(dueTo);
-        //addSub();
     }
 
     const addSub = async () => {

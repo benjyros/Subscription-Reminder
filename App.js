@@ -1,12 +1,9 @@
 import * as React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './screens/Home';
 import CreateReminder from './screens/CreateReminder';
-import EditReminder from './screens/EditReminder';
-import DeleteReminder from './screens/DeleteReminder';
 import Tutorial1 from './screens/tutorial1';
 import Tutorial2 from './screens/tutorial2';
 import Tutorial3 from './screens/tutorial3';
@@ -29,8 +26,6 @@ const App = () => {
           <Stack.Screen name="Tutorial5" component={Tutorial5} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="CreateReminder" component={CreateReminder} />
-        <Stack.Screen name="editReminder" component={EditReminder} />
-        <Stack.Screen name="deleteReminder" component={DeleteReminder} />
       </Stack.Navigator>
     </NavigationContainer>
   );

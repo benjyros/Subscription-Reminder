@@ -2,7 +2,6 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 import {
     StyleSheet,
-    ScrollView,
     TouchableOpacity,
     Text,
     View,
