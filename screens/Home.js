@@ -95,7 +95,7 @@ export default function Home({ navigation }) {
       <View style={styles.buttonView}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("CreateReminder")}
+          onPress={() => navigation.replace("CreateReminder")}
         >
           <Text style={styles.buttonText}>Create Reminder</Text>
         </TouchableOpacity>

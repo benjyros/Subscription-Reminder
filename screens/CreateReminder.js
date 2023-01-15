@@ -29,9 +29,10 @@ export default function CreateReminder({ navigation }) {
     const [subItems, setSubItems] = useState([]);
 
     const handleAddSub = () => {
-        navigation.navigate('Home');
+        
         setSubItems([...subItems, sub]);
         addSub();
+        navigation.replace('Home');
 
     }
 
@@ -102,7 +103,7 @@ export default function CreateReminder({ navigation }) {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() =>
-                            navigation.navigate('Home')
+                            navigation.replace('Home')
                         }
                     >
                         <Text style={styles.buttonText}>Cancel</Text>
