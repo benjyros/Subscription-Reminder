@@ -25,10 +25,12 @@ export default function Home({ navigation }) {
 
       cSnap.forEach((subscription) => {
         const newSubscription = {
+          id: subscription.data().id,
           title: subscription.data().title,
           costs: subscription.data().costs,
-          cycle: subscription.data().selectedCycle,
+          cycle: subscription.data().cycle,
           startDate: subscription.data().startDate,
+          dueTo: subscription.data().dueTo,
           description: subscription.data().description,
         };
         subscriptions.push(newSubscription);
@@ -44,12 +46,12 @@ export default function Home({ navigation }) {
     setSubscriptions(subscriptionCopy);
   }*/
 
-  const handleDelete = async (title) => {
-    const subscriptionRef = doc(firestore, "subs", title);
+  const handleDelete = async (startDate, id) => {
+    const subscriptionRef = doc(firestore, "subs", startDate + ":" + id);
     await deleteDoc(subscriptionRef);
 
     const newSubscriptions = subscriptions.slice();
-    const index = newSubscriptions.findIndex((sub) => sub.title === title);
+    const index = newSubscriptions.findIndex((sub) => sub.id === id);
     newSubscriptions.splice(index, 1);
     setSubscriptions(newSubscriptions);
   };
@@ -60,7 +62,7 @@ export default function Home({ navigation }) {
         <Text style={styles.title}>Twäwis-Reminder</Text>
       </View>
       <ScrollView style={styles.main}>
-        {subscriptions.map(({ title, costs, cycle, startDate, description }, index) => (
+        {subscriptions.map(({ id, title, costs, cycle, startDate, dueTo, description }, index) => (
           <View key={index}>
             <TouchableOpacity>
               <View style={styles.item}>
@@ -69,7 +71,7 @@ export default function Home({ navigation }) {
                   <Text style={styles.textName}>{title}</Text>
                 </View>
                 <View style={styles.trashWrapper}>
-                  <TouchableOpacity onPress={() => handleDelete(title)}>
+                  <TouchableOpacity onPress={() => handleDelete(startDate, id)}>
                     <Image
                       style={styles.trashImage}
                       source={require("../images/trash.png")}
@@ -81,7 +83,10 @@ export default function Home({ navigation }) {
                 </View>
                 <View style={styles.paymentInfo}>
                   <Text style={styles.textPaymentInfo}>
-                    Payment is due {moment(startDate).format("DD-MM-YYYY")}
+                    Payment every {cycle}
+                  </Text>
+                  <Text style={styles.textPaymentInfo}>
+                    Payment is due {dueTo}
                   </Text>
                 </View>
                 <View style={styles.paymentAmount}>
@@ -191,7 +196,6 @@ const styles = StyleSheet.create({
     bottom: 5,
     padding: 10,
     alignItems: "center",
-    flexDirection: "row",
   },
   textPaymentInfo: {
     fontSize: 13,

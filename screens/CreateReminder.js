@@ -1,47 +1,144 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity, Text, TextInput, View, VirtualizedList, } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 import { firestore } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
+
 import moment from "moment/moment";
 
 export default function CreateReminder({ navigation }) {
-    const [title, setTitle] = React.useState("");
-    const [description, setDescription] = React.useState("");
-    const [costs, setCosts] = React.useState("");
-    const [selectedCycle, setSelectedCycle] = React.useState("");
-    const [startDate, setStartDate] = useState(moment().toDate());
+    const [day, setDay] = useState();
+    const [month, setMonth] = useState();
+    const [year, setYear] = useState();
+    const [days, setDays] = useState([]);
+    const [months, setMonths] = useState([]);
+    const [years, setYears] = useState([]);
+    const [openDay, setOpenDay] = useState(false);
+    const [openMonth, setOpenMonth] = useState(false);
+    const [openYear, setOpenYear] = useState(false);
+
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [costs, setCosts] = useState("");
+    const [selectedCycle, setSelectedCycle] = useState("week");
+    const [dueTo, setDueTo] = useState("");
+
+    useEffect(() => {
+        function fetchData() {
+            var days = [];
+            var months = [];
+            var years = [];
+
+            for (let i = 1; i <= 31; i++) {
+                var label = i;
+                if (i < 10) {
+                    label = "0" + label;
+                }
+                const newDay = {
+                    label: label,
+                    value: label,
+                }
+                days.push(newDay);
+            }
+            for (let i = 1; i <= 12; i++) {
+                var label = i;
+                if (i < 10) {
+                    label = "0" + label;
+                }
+                const newMonth = {
+                    label: label,
+                    value: label,
+                }
+                months.push(newMonth);
+            }
+            for (let i = 1970; i <= new Date().getFullYear(); i++) {
+                const newYear = {
+                    label: i,
+                    value: i,
+                }
+                years.push(newYear);
+            }
+
+            setDays(days);
+            setMonths(months);
+            setYears(years);
+        };
+        fetchData();
+    }, [])
 
     const handleCycleChange = (itemValue) => {
         setSelectedCycle(itemValue);
-        if (itemValue === 'week') {
-            setStartDate((startDate) => moment(startDate).add(1, 'week').toDate());
-        } else if (itemValue === 'month') {
-            setStartDate((startDate) => moment(startDate).add(1, 'month').toDate());
-        } else if (itemValue === 'year') {
-            setStartDate((startDate) => moment(startDate).add(1, 'year').toDate());
-        }
-      }
+    }
 
-
-    const [sub, setSub] = React.useState();
-    const [subItems, setSubItems] = useState([]);
 
     const handleAddSub = () => {
-        
-        setSubItems([...subItems, sub]);
-        addSub();
-        navigation.replace('Home');
+        if (day != "" && month != "" && year != "" && title != "" && costs != "") {
+            const date = year + "-" + month + "-" + day;
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (dateRegex.test(date) && !moment(date).isAfter(moment())) {
+                addSub();
+                navigation.replace('Home');
+            } else {
+                alert("Entered date does not exist!");
+            }
+        } else {
+            alert("Please check the details again.");
+        }
 
     }
 
+    const setUntilTo = async () => {
+        
+        getDueTo();
+        
+    }
+
+    const getDueTo = () => {
+        const date = year + "-" + month + "-" + day;
+        const currentDate = new Date();
+        const newDate = new Date(date);
+        const currentTimeInSeconds = currentDate.getTime();
+        var dueTo = newDate.getTime();
+        if (selectedCycle === "week") {
+            //const newDate = moment(date, "YYYY-MM-DD").add(7, 'days');
+            do {
+                dueTo = dueTo + (7 * 24 * 60 * 60 * 1000);
+            } while (dueTo < currentTimeInSeconds);
+        } else if (selectedCycle === "month") {
+            let i = 1;
+            do {
+                dueTo = moment(dueTo).add(i, "months").endOf("month").valueOf();
+                i++;
+            } while (dueTo < currentTimeInSeconds);
+        } else if (selectedCycle === "year") {
+            let i = 1;
+            do {
+                dueTo = moment(dueTo).add(i, "years").valueOf();
+                i++;
+            } while (dueTo < currentTimeInSeconds);
+        }
+        return dueTo;
+        //etDueTo(dueTo);
+        //addSub();
+    }
+
     const addSub = async () => {
-        await setDoc(doc(firestore, 'subs', title), {
+        var dueTo = getDueTo();
+        let date = new Date(dueTo);
+        let formattedDate = date.toISOString().slice(0, 10);
+
+        var currentTimeInSeconds = Math.round(new Date().getTime() / 1000);
+        const startDate = year + "-" + month + "-" + day;
+        await setDoc(doc(firestore, 'subs', formattedDate + ":" + currentTimeInSeconds.toString()), {
+            id: currentTimeInSeconds.toString(),
             title: title,
             costs: costs,
             cycle: selectedCycle,
-            startDate: moment(startDate).format("YYYY-MM-DD"),
+            startDate: startDate,
+            dueTo: formattedDate,
             description: description
         });
     }
@@ -57,39 +154,112 @@ export default function CreateReminder({ navigation }) {
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps='handled'
             >
-                <Text>Title of Subscription:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder={"title"}
-                    value={title}
-                    onChangeText={text => setTitle(text)}
-                />
-                <Text>Costs:</Text>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={cost => setCosts(cost)}
-                    keyboardType="numeric"
-                    placeholder={"CHF"}
-                    value={costs}
-                />
-                <Text>Start:</Text>
+                <View style={styles.components}>
+                    <Text>Title of Subscription:</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder={"title"}
+                        value={title}
+                        onChangeText={text => setTitle(text)}
+                    />
+                </View>
+                <View style={styles.components}>
+                    <Text>Costs:</Text>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={cost => setCosts(cost)}
+                        keyboardType="numeric"
+                        placeholder={"CHF"}
+                        value={costs}
+                    />
+                </View>
+                <View style={styles.components}>
+                    <Text>Start:</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
+                        <DropDownPicker
+                            open={openDay}
+                            value={day}
+                            items={days}
+                            setOpen={setOpenDay}
+                            onOpen={() => {
+                                setOpenMonth();
+                                setOpenYear();
+                            }}
+                            setValue={setDay}
+                            setItems={setDays}
+                            maxHeight={150}
+                            textStyle={{
+                                fontSize: 10,
+                            }}
+                            style={{ backgroundColor: "#efdbcb" }}
+                            containerStyle={{ width: 100 }}
+                        />
 
-                <Text>Payment Cycle:</Text>
-                <Picker style={styles.picker}
-                    selectedValue={selectedCycle}
-                    onValueChange={handleCycleChange}>
-                    <Picker.Item label='Every Week' value='week' />
-                    <Picker.Item label='Every Month' value='month' />
-                    <Picker.Item label='Every Year' value='year' />
-                </Picker>
-                <Text>Description:</Text>
-                <TextInput
-                    style={styles.multiInput}
-                    placeholder={"description"}
-                    onChangeText={description => setDescription(description)}
-                    value={description}
-                />
+
+                        <Text style={{ margin: 10 }}>-</Text>
+                        <DropDownPicker
+                            open={openMonth}
+                            value={month}
+                            items={months}
+                            setOpen={setOpenMonth}
+                            onOpen={() => {
+                                setOpenDay();
+                                setOpenYear();
+                            }}
+                            setValue={setMonth}
+                            setItems={setMonths}
+                            maxHeight={150}
+                            textStyle={{
+                                fontSize: 10
+                            }}
+                            style={{ backgroundColor: "#efdbcb" }}
+                            containerStyle={{ width: 100 }}
+                        />
+
+                        <Text style={{ margin: 10 }}>-</Text>
+                        <DropDownPicker
+                            open={openYear}
+                            value={year}
+                            items={years}
+                            setOpen={setOpenYear}
+                            onOpen={() => {
+                                setOpenDay();
+                                setOpenMonth();
+                            }}
+                            setValue={setYear}
+                            setItems={setYears}
+                            maxHeight={150}
+                            textStyle={{
+                                fontSize: 10
+                            }}
+                            style={{ backgroundColor: "#efdbcb" }}
+                            containerStyle={{ width: 100 }}
+                        />
+
+                    </View>
+                </View>
+                <View style={[styles.components, { marginTop: 150 }]}>
+                    <Text>Payment Cycle:</Text>
+                    <Picker
+                        selectedValue={selectedCycle}
+                        onValueChange={handleCycleChange}
+                    >
+                        <Picker.Item label='Every Week' value='week' />
+                        <Picker.Item label='Every Month' value='month' />
+                        <Picker.Item label='Every Year' value='year' />
+                    </Picker>
+                </View>
+                <View style={styles.components}>
+                    <Text>Description:</Text>
+                    <TextInput
+                        style={styles.multiInput}
+                        placeholder={"description"}
+                        onChangeText={description => setDescription(description)}
+                        value={description}
+                    />
+                </View>
             </ScrollView>
+
             <View style={styles.buttonView}>
                 <View style={{ width: '50%', paddingRight: 10 }}>
                     <TouchableOpacity
@@ -145,6 +315,9 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingHorizontal: 20,
     },
+    components: {
+        marginBottom: 30,
+    },
     input: {
         height: 40,
         borderWidth: 1,
@@ -175,7 +348,4 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#fff',
     },
-    picker: {
-
-    }
 });

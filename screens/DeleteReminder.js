@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 
-export default function DeleteReminder ({ navigation }) {
+export default function DeleteReminder({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
